@@ -203,7 +203,52 @@ model = auto_arima(training, start_p = 1, start_q = 1,
                    max_p = 3, max_q = 3, m = 12, start_P = 0, seasonal = True,
                    d = 1, D = 1, trace = True, error_action = 'ignore', 
                    suppress_warnings = True)
+model.fit(training)
+
+forecast = model.predict(n_periods = 247)
+forecast = pd.DataFrame(forecast, index = valid.index, columns = ['Prediction'])
+
+rms=np.sqrt(np.mean(np.power((np.array(valid['Close'])-np.array(forecast['Prediction'])),2)))
+rms
+
+plt.plot(train['Close'])
+plt.plot(valid['Close'])
+plt.plot(forecast['Prediction'])
 
 
+## PROPHET - input (dataFrame with date and target)
+from fbprophet import Prophet
 
+new_data = pd.DataFrame(index=range(0, len(datafile)), columns = ['Date', 'Close'])
 
+for i in range(0, len(data)):
+    new_data['Date'][i] = data['Date'][i]
+    new_data['Close'][i] = data['Close'][i]
+ 
+new_data['Date'] = pd.to_datetime(new_data.Date, format='%Y-%m-%d')
+new_data.index = new_data['Date']
+
+new_data.rename(columns = {'Close':'y', 'Date': 'ds'}, inplace = True)
+
+train = new_data[:987]
+valid = new_data[987:]
+
+model = Prophet()
+model.fit(train)
+
+close_prices = model.make_future_dataframe(periods=len(valid))
+forecast = model.predict(close_prices)
+
+forecast_valid = forecast['yhat'][987:]
+rms = np.sqrt(np.mean(np.power((np.array(valid['y'])-np.array(forecast_valid)),2)))
+rms
+
+# 93.9.......
+
+valid['Predictions'] = 0
+valid['Predictions'] = forecast_valid.values
+
+plt.plot(train['y'])
+plt.plot(valid[['y', 'Predictions']])
+
+# Still following upwards trend as drop is unseen
