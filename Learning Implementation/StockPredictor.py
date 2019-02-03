@@ -264,8 +264,8 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM
 
 #creating dataframe
-data = df.sort_index(ascending=True, axis=0)
-new_data = pd.DataFrame(index=range(0,len(df)),columns=['Date', 'Close'])
+data = datafile.sort_index(ascending=True, axis=0)
+new_data = pd.DataFrame(index=range(0,len(datafile)),columns=['Date', 'Close'])
 for i in range(0,len(data)):
     new_data['Date'][i] = data['Date'][i]
     new_data['Close'][i] = data['Close'][i]
@@ -314,3 +314,14 @@ X_test = np.array(X_test)
 X_test = np.reshape(X_test, (X_test.shape[0],X_test.shape[1],1))
 closing_price = model.predict(X_test)
 closing_price = scaler.inverse_transform(closing_price)
+
+rms = np.sqrt(np.mean(np.power((valid-closing_price),2)))
+rms
+
+
+train = new_data[:987]
+valid = new_data[987:]
+valid['Predictions'] = closing_price
+plt.plot(train['Close'])
+plt.plot(valid[['Close', 'Predictions']])
+
