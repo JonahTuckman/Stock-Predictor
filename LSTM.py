@@ -20,12 +20,12 @@ from keras.models import Sequential
 from keras.layers import Dense, Dropout, LSTM
 import os 
 
+os.chdir('/Users/JonahTuckman/Desktop/Projects/Stock-Predictors')
 
 from matplotlib.pylab import rcParams
 rcParams['figure.figsize'] = 20,10
 
 # Normalizing the data
-from sklearn.preprocessing import MinMaxScaler
 scaler = MinMaxScaler(feature_range = (0,1))
 
 # Read the file
@@ -70,7 +70,7 @@ model.add(Dense(1))
 model.compile(loss='mean_squared_error', optimizer='adam')
 model.fit(x_train, y_train, epochs=1, batch_size=1, verbose=2)
 
-#predicting 246 values, using past 60 from the train data
+# predicting 246 values, using past 60 from the train data
 inputs = new_data[len(new_data) - len(valid) - 60:].values
 inputs = inputs.reshape(-1,1)
 inputs  = scaler.transform(inputs)
@@ -93,10 +93,6 @@ valid = new_data[987:]
 valid['Predictions'] = closing_price
 plt.plot(train['Close'])
 plt.plot(valid[['Close', 'Predictions']])
-
-X_test
-
-pred_point = model.predict([[2015-02-02]])
 
 
 
